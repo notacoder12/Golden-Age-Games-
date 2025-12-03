@@ -284,4 +284,26 @@ textarea {
   opacity: 0.95;
   font-weight: 500;
 }
+.popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.popup-content {
+  background: #1e293b;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  text-align: center;
+  border: 1px solid #fbbf24;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+}
+
+.popup.hidden {
+  display: none;
+}
 

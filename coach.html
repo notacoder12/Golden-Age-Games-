@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Coach Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="app-container">
+    <h2>Coach Dashboard</h2>
+    <p class="subtitle">Full Team Practice Log</p>
+
+    <button id="load-all" class="primary-button">Load All Logs</button>
+
+    <p id="coach-msg" class="status-message"></p>
+
+    <div id="coach-list" class="card hidden">
+      <ul id="coach-entries"></ul>
+    </div>
+  </div>
+
+  <script src="coach.js"></script>
+</body>
+</html>

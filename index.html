@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Golden Age Games Practice Log</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <h1>Golden Age Games</h1>
+      <p class="subtitle">Practice Log & Progress Tracker</p>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-button active" data-tab="log">Log Practice</button>
+      <button class="tab-button" data-tab="progress">View Progress</button>
+    </nav>
+
+    <main class="tab-content-container">
+      <!-- Log Practice Tab -->
+      <section id="tab-log" class="tab-content active">
+        <h2>Log Today&apos;s Practice</h2>
+        <form id="log-form" class="card">
+          <div class="form-group">
+            <label for="name">Veteran</label>
+            <select id="name" required>
+              <!-- PLACEHOLDER NAMES - change these later -->
+              <option value="" disabled selected>Select your name</option>
+              <option value="Veteran 1">Veteran 1</option>
+              <option value="Veteran 2">Veteran 2</option>
+              <option value="Veteran 3">Veteran 3</option>
+              <option value="Veteran 4">Veteran 4</option>
+              <option value="Veteran 5">Veteran 5</option>
+              <option value="Veteran 6">Veteran 6</option>
+              <option value="Veteran 7">Veteran 7</option>
+              <option value="Veteran 8">Veteran 8</option>
+              <option value="Veteran 9">Veteran 9</option>
+              <option value="Veteran 10">Veteran 10</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="event">Event</label>
+            <select id="event" required>
+              <option value="" disabled selected>Select your event</option>
+              <option value="Shuffleboard">Shuffleboard</option>
+              <option value="Bocce">Bocce</option>
+              <option value="Cornhole">Cornhole</option>
+              <option value="Air Pistol">Air Pistol</option>
+              <option value="Air Rifle">Air Rifle</option>
+              <option value="Track">Track</option>
+              <option value="Basketball Free Throw">Basketball Free Throw</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="minutes">Minutes Practiced</label>
+            <input type="number" id="minutes" min="0" step="1" placeholder="e.g. 20" required />
+          </div>
+
+          <div class="form-group">
+            <label for="notes">Notes (optional)</label>
+            <textarea id="notes" rows="3" placeholder="How did practice feel today?"></textarea>
+          </div>
+
+          <button type="submit" class="primary-button">Submit Practice</button>
+          <p id="log-message" class="status-message" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <!-- Progress Tab -->
+      <section id="tab-progress" class="tab-content">
+        <h2>View Progress</h2>
+        <div class="card">
+          <div class="form-group">
+            <label for="progress-name">Veteran</label>
+            <select id="progress-name">
+              <option value="" disabled selected>Select your name</option>
+              <!-- same placeholders - keep in sync with above -->
+              <option value="Veteran 1">Veteran 1</option>
+              <option value="Veteran 2">Veteran 2</option>
+              <option value="Veteran 3">Veteran 3</option>
+              <option value="Veteran 4">Veteran 4</option>
+              <option value="Veteran 5">Veteran 5</option>
+              <option value="Veteran 6">Veteran 6</option>
+              <option value="Veteran 7">Veteran 7</option>
+              <option value="Veteran 8">Veteran 8</option>
+              <option value="Veteran 9">Veteran 9</option>
+              <option value="Veteran 10">Veteran 10</option>
+            </select>
+          </div>
+
+          <button id="load-progress" class="secondary-button">Load Progress</button>
+          <p id="progress-message" class="status-message" aria-live="polite"></p>
+
+          <div id="progress-summary" class="progress-summary hidden">
+            <h3>Summary</h3>
+            <p><strong>Total Minutes:</strong> <span id="total-minutes">0</span></p>
+            <p><strong>Sessions Logged:</strong> <span id="session-count">0</span></p>
+          </div>
+
+          <div id="progress-chart" class="progress-chart hidden">
+            <h3>Recent Sessions</h3>
+            <div id="chart-bars" class="chart-bars"></div>
+          </div>
+
+          <div id="progress-list" class="progress-list hidden">
+            <h3>Practice History</h3>
+            <ul id="log-list"></ul>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

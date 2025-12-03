@@ -254,3 +254,34 @@ textarea {
     padding: 1rem;
   }
 }
+.va-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(15, 23, 42, 0.9);
+  padding: 1rem;
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.va-logo {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+}
+
+.va-title h1 {
+  margin: 0;
+  color: #fbbf24;
+  font-size: 2rem;
+}
+
+.va-slogan {
+  margin: 0;
+  color: #e5e7eb;
+  font-size: 1.1rem;
+  opacity: 0.95;
+  font-weight: 500;
+}
+

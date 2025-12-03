@@ -17,6 +17,18 @@ tabButtons.forEach((btn) => {
   });
 });
 
+// === POPUP FUNCTION ===
+function showPopup(message) {
+  const popup = document.getElementById("popup");
+  const popupText = document.getElementById("popup-text");
+  popupText.textContent = message;
+  popup.classList.remove("hidden");
+
+  document.getElementById("popup-btn").onclick = () => {
+    popup.classList.add("hidden");
+  };
+}
+
 // === LOG PRACTICE FORM ===
 const logForm = document.getElementById("log-form");
 const logMessage = document.getElementById("log-message");
@@ -38,19 +50,19 @@ logForm.addEventListener("submit", async (e) => {
   }
 
   try {
-    const response = await fetch(SCRIPT_URL, {
+    await fetch(SCRIPT_URL, {
       method: "POST",
-      mode: "no-cors", // allows simple POST without CORS issues
+      mode: "no-cors",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({ name, event, minutes, notes })
     });
 
-    // With no-cors we can't inspect the response, so assume success if no error thrown
-    logMessage.textContent = "Practice logged! Great work.";
-    logMessage.classList.add("success");
+    // === SUCCESS ===
+    showPopup("Your practice has been logged. Great work, athlete!");
     logForm.reset();
+    logMessage.textContent = "";
   } catch (err) {
     console.error(err);
     logMessage.textContent = "Something went wrong. Please tell your coach.";
@@ -104,13 +116,13 @@ loadProgressButton.addEventListener("click", async () => {
       return;
     }
 
-    // Show summary
+    // === SUMMARY ===
     const totalMinutes = logs.reduce((sum, entry) => sum + Number(entry.minutes || 0), 0);
     totalMinutesEl.textContent = totalMinutes;
     sessionCountEl.textContent = logs.length;
     summarySection.classList.remove("hidden");
 
-    // Build a simple recent chart (last 7 sessions)
+    // === CHART (Last 7 sessions) ===
     const recent = logs.slice(-7);
     const maxMinutes = Math.max(...recent.map((l) => Number(l.minutes || 0)), 1);
     chartBarsContainer.innerHTML = "";
@@ -135,7 +147,7 @@ loadProgressButton.addEventListener("click", async () => {
 
     chartSection.classList.remove("hidden");
 
-    // Build history list
+    // === HISTORY LIST ===
     logList.innerHTML = "";
     logs
       .slice()
@@ -157,6 +169,7 @@ loadProgressButton.addEventListener("click", async () => {
 
     progressMessage.textContent = "";
     progressMessage.className = "status-message";
+
   } catch (err) {
     console.error(err);
     progressMessage.textContent = "Could not load progress. Please tell your coach.";

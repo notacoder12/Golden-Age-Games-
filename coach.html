@@ -3,22 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <title>Coach Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
   <div class="app-container">
-    <h2>Coach Dashboard</h2>
-    <p class="subtitle">Full Team Practice Log</p>
 
-    <button id="load-all" class="primary-button">Load All Logs</button>
+    <header class="va-header">
+      <img src="va.webp" alt="VA Logo" class="va-logo">
+      <div class="va-title">
+        <h1>Coach Dashboard</h1>
+        <p class="va-slogan">Eyes on the mission.</p>
+      </div>
+    </header>
 
-    <p id="coach-msg" class="status-message"></p>
+    <!-- PIN GATE -->
+    <section id="pin-gate" class="card">
+      <h2>Enter Coach PIN</h2>
+      <p class="subtitle">Private dashboard</p>
 
-    <div id="coach-list" class="card hidden">
-      <ul id="coach-entries"></ul>
-    </div>
+      <div class="form-group">
+        <label for="coach-pin">PIN</label>
+        <input id="coach-pin" type="password" inputmode="numeric" maxlength="8" placeholder="Enter PIN" />
+      </div>
+
+      <button id="pin-submit" class="primary-button">Unlock</button>
+      <p id="pin-msg" class="status-message" aria-live="polite"></p>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="hidden">
+      <div class="card">
+        <h2>Full Team Log</h2>
+        <p class="subtitle">All entries across all veterans</p>
+
+        <div class="tabs" style="margin-top: 1rem;">
+          <button id="load-all" class="secondary-button">Load All Logs</button>
+          <button id="lock" class="primary-button">Lock</button>
+        </div>
+
+        <p id="coach-msg" class="status-message" aria-live="polite"></p>
+
+        <div id="coach-list" class="card hidden" style="margin-top: 1rem;">
+          <ul id="coach-entries"></ul>
+        </div>
+      </div>
+    </section>
+
   </div>
 
   <script src="coach.js"></script>

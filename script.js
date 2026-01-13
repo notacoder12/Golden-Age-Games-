@@ -1,35 +1,58 @@
-// === CONFIG: PUT YOUR APPS SCRIPT URL HERE ===
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzoMEl_KNd6sByZF3ycDl2gUMLdBFSD51PpUh0C9nJTf_DwNZi7LveQZ-TVZjefiFTG/exec";
 
-// === TAB SWITCHING ===
+// Tabs
 const tabButtons = document.querySelectorAll(".tab-button");
 const tabContents = document.querySelectorAll(".tab-content");
 
 tabButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     const target = btn.getAttribute("data-tab");
-
     tabButtons.forEach((b) => b.classList.remove("active"));
     tabContents.forEach((c) => c.classList.remove("active"));
-
     btn.classList.add("active");
     document.getElementById(`tab-${target}`).classList.add("active");
   });
 });
 
-// === POPUP FUNCTION ===
+// Popup
 function showPopup(message) {
   const popup = document.getElementById("popup");
   const popupText = document.getElementById("popup-text");
   popupText.textContent = message;
   popup.classList.remove("hidden");
-
-  document.getElementById("popup-btn").onclick = () => {
-    popup.classList.add("hidden");
-  };
+  document.getElementById("popup-btn").onclick = () => popup.classList.add("hidden");
 }
 
-// === LOG PRACTICE FORM ===
+// Confetti flare
+function confettiBurst(count = 50) {
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement("div");
+    piece.className = "confetti";
+
+    // Random horizontal start
+    piece.style.left = Math.random() * 100 + "vw";
+
+    // Random size
+    const w = 6 + Math.random() * 8;
+    const h = 8 + Math.random() * 12;
+    piece.style.width = w + "px";
+    piece.style.height = h + "px";
+
+    // Random color
+    const colors = ["#fbbf24", "#38bdf8", "#f97316", "#a78bfa", "#34d399", "#fb7185"];
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+    // Random rotation and drift
+    piece.style.transform = `translateY(0) rotate(${Math.random() * 360}deg)`;
+    piece.style.animationDuration = 0.9 + Math.random() * 0.8 + "s";
+
+    document.body.appendChild(piece);
+
+    setTimeout(() => piece.remove(), 1600);
+  }
+}
+
+// Log Practice
 const logForm = document.getElementById("log-form");
 const logMessage = document.getElementById("log-message");
 
@@ -53,14 +76,12 @@ logForm.addEventListener("submit", async (e) => {
     await fetch(SCRIPT_URL, {
       method: "POST",
       mode: "no-cors",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, event, minutes, notes })
     });
 
-    // === SUCCESS ===
-    showPopup("Your practice has been logged. Great work, athlete!");
+    confettiBurst(70);
+    showPopup("Logged. Great work, athlete!");
     logForm.reset();
     logMessage.textContent = "";
   } catch (err) {
@@ -70,7 +91,7 @@ logForm.addEventListener("submit", async (e) => {
   }
 });
 
-// === PROGRESS VIEW ===
+// Progress View
 const progressNameSelect = document.getElementById("progress-name");
 const loadProgressButton = document.getElementById("load-progress");
 const progressMessage = document.getElementById("progress-message");
@@ -101,9 +122,7 @@ loadProgressButton.addEventListener("click", async () => {
     const res = await fetch(url);
     const data = await res.json();
 
-    if (data.status !== "success") {
-      throw new Error(data.message || "Unknown error from server");
-    }
+    if (data.status !== "success") throw new Error(data.message || "Unknown error");
 
     const logs = data.logs || [];
 
@@ -116,13 +135,11 @@ loadProgressButton.addEventListener("click", async () => {
       return;
     }
 
-    // === SUMMARY ===
     const totalMinutes = logs.reduce((sum, entry) => sum + Number(entry.minutes || 0), 0);
     totalMinutesEl.textContent = totalMinutes;
     sessionCountEl.textContent = logs.length;
     summarySection.classList.remove("hidden");
 
-    // === CHART (Last 7 sessions) ===
     const recent = logs.slice(-7);
     const maxMinutes = Math.max(...recent.map((l) => Number(l.minutes || 0)), 1);
     chartBarsContainer.innerHTML = "";
@@ -133,8 +150,7 @@ loadProgressButton.addEventListener("click", async () => {
 
       const inner = document.createElement("div");
       inner.className = "chart-bar-inner";
-      const heightPercent = (Number(entry.minutes || 0) / maxMinutes) * 100;
-      inner.style.height = `${heightPercent}%`;
+      inner.style.height = `${(Number(entry.minutes || 0) / maxMinutes) * 100}%`;
 
       const label = document.createElement("div");
       label.className = "chart-bar-label";
@@ -147,29 +163,21 @@ loadProgressButton.addEventListener("click", async () => {
 
     chartSection.classList.remove("hidden");
 
-    // === HISTORY LIST ===
     logList.innerHTML = "";
-    logs
-      .slice()
-      .reverse()
-      .forEach((entry) => {
-        const li = document.createElement("li");
-        const date = new Date(entry.timestamp);
-        const dateStr = isNaN(date.getTime())
-          ? ""
-          : date.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+    logs.slice().reverse().forEach((entry) => {
+      const li = document.createElement("li");
+      const date = new Date(entry.timestamp);
+      const dateStr = isNaN(date.getTime())
+        ? ""
+        : date.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 
-        li.textContent = `${dateStr} — ${entry.event} — ${entry.minutes} min${
-          entry.notes ? " — " + entry.notes : ""
-        }`;
-        logList.appendChild(li);
-      });
+      li.textContent = `${dateStr} — ${entry.event} — ${entry.minutes} min${entry.notes ? " — " + entry.notes : ""}`;
+      logList.appendChild(li);
+    });
 
     listSection.classList.remove("hidden");
 
     progressMessage.textContent = "";
-    progressMessage.className = "status-message";
-
   } catch (err) {
     console.error(err);
     progressMessage.textContent = "Could not load progress. Please tell your coach.";

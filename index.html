@@ -6,23 +6,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
- <header class="va-header">
-  <img src="va.webp" alt="VA Logo" class="va-logo">
+  <!-- VA HEADER -->
+  <header class="va-header">
+    <img src="va.webp" alt="VA Logo" class="va-logo" />
 
-  <div class="va-title">
-    <h1>Golden Age Games</h1>
-    <p class="va-slogan">One Team. One Mission. One Golden Age.</p>
-  </div>
-</header>
+    <div class="va-title">
+      <h1>Golden Age Games</h1>
+      <p class="va-slogan">One Team. One Mission. One Golden Age.</p>
 
-
+      <!-- BADGES -->
+      <div class="va-badges">
+        <span class="badge">VA • CLC</span>
+        <span class="badge">Team Practice</span>
+        <span class="badge">2026 Season</span>
+      </div>
+    </div>
+  </header>
 
   <div class="app-container">
-    <header class="app-header">
-      <p class="subtitle">Practice Log & Progress Tracker</p>
-    </header>
-
     <nav class="tabs">
       <button class="tab-button active" data-tab="log">Log Practice</button>
       <button class="tab-button" data-tab="progress">View Progress</button>
@@ -32,11 +35,11 @@
       <!-- Log Practice Tab -->
       <section id="tab-log" class="tab-content active">
         <h2>Log Today&apos;s Practice</h2>
+
         <form id="log-form" class="card">
           <div class="form-group">
             <label for="name">Veteran</label>
             <select id="name" required>
-              <!-- PLACEHOLDER NAMES - change these later -->
               <option value="" disabled selected>Select your name</option>
               <option value="Veteran 1">Veteran 1</option>
               <option value="Veteran 2">Veteran 2</option>
@@ -77,18 +80,21 @@
 
           <button type="submit" class="primary-button">Submit Practice</button>
           <p id="log-message" class="status-message" aria-live="polite"></p>
+
+          <!-- MICRO HYPE -->
+          <p class="micro-hype">Log it. Own it. Build the streak.</p>
         </form>
       </section>
 
       <!-- Progress Tab -->
       <section id="tab-progress" class="tab-content">
         <h2>View Progress</h2>
+
         <div class="card">
           <div class="form-group">
             <label for="progress-name">Veteran</label>
             <select id="progress-name">
               <option value="" disabled selected>Select your name</option>
-              <!-- same placeholders - keep in sync with above -->
               <option value="Veteran 1">Veteran 1</option>
               <option value="Veteran 2">Veteran 2</option>
               <option value="Veteran 3">Veteran 3</option>
@@ -126,13 +132,16 @@
   </div>
 
   <script src="script.js"></script>
-  <div id="popup" class="popup hidden">
-  <div class="popup-content">
-    <p id="popup-text">Practice Logged Successfully!</p>
-    <button id="popup-btn" class="primary-button">OK</button>
-  </div>
-</div>
-<a href="coach.html" style="display:none;">coach</a>
 
+  <!-- Popup (used by the popup-enabled script.js) -->
+  <div id="popup" class="popup hidden">
+    <div class="popup-content">
+      <p id="popup-text">Practice Logged Successfully!</p>
+      <button id="popup-btn" class="primary-button">OK</button>
+    </div>
+  </div>
+
+  <!-- Hidden Coach Link -->
+  <a href="coach.html" style="display:none;">coach</a>
 </body>
 </html>

@@ -306,4 +306,23 @@ textarea {
 .popup.hidden {
   display: none;
 }
+/* Confetti */
+.confetti {
+  position: fixed;
+  top: -10px;
+  width: 10px;
+  height: 14px;
+  border-radius: 3px;
+  opacity: 0.95;
+  pointer-events: none;
+  z-index: 1000;
+  animation: confetti-fall 1.2s linear forwards;
+}
+
+@keyframes confetti-fall {
+  to {
+    transform: translateY(110vh) rotate(540deg);
+    opacity: 0;
+  }
+}
 

@@ -4,54 +4,55 @@
   <meta charset="UTF-8" />
   <title>Coach Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=20260131a" />
 </head>
 <body>
+  <header class="va-header">
+    <img src="va.webp" alt="VA Logo" class="va-logo">
+    <div class="va-title">
+      <h1>Coach Dashboard</h1>
+      <p class="va-slogan">Coach tools + team visibility</p>
+    </div>
+  </header>
+
   <div class="app-container">
+    <main class="tab-content-container">
+      <section class="card">
+        <h2>Coach Access</h2>
 
-    <header class="va-header">
-      <img src="va.webp" alt="VA Logo" class="va-logo">
-      <div class="va-title">
-        <h1>Coach Dashboard</h1>
-        <p class="va-slogan">Eyes on the mission.</p>
-      </div>
-    </header>
-
-    <!-- PIN GATE -->
-    <section id="pin-gate" class="card">
-      <h2>Enter Coach PIN</h2>
-      <p class="subtitle">Private dashboard</p>
-
-      <div class="form-group">
-        <label for="coach-pin">PIN</label>
-        <input id="coach-pin" type="password" inputmode="numeric" maxlength="8" placeholder="Enter PIN" />
-      </div>
-
-      <button id="pin-submit" class="primary-button">Unlock</button>
-      <p id="pin-msg" class="status-message" aria-live="polite"></p>
-    </section>
-
-    <!-- DASHBOARD -->
-    <section id="dashboard" class="hidden">
-      <div class="card">
-        <h2>Full Team Log</h2>
-        <p class="subtitle">All entries across all veterans</p>
-
-        <div class="tabs" style="margin-top: 1rem;">
-          <button id="load-all" class="secondary-button">Load All Logs</button>
-          <button id="lock" class="primary-button">Lock</button>
+        <div class="form-group">
+          <label for="coach-pin">Coach PIN</label>
+          <input id="coach-pin" type="password" placeholder="Enter PIN" />
         </div>
 
-        <p id="coach-msg" class="status-message" aria-live="polite"></p>
+        <button id="unlock" class="primary-button">Unlock</button>
+        <p id="coach-msg" class="status-message"></p>
+      </section>
 
-        <div id="coach-list" class="card hidden" style="margin-top: 1rem;">
-          <ul id="coach-entries"></ul>
+      <section id="coach-tools" class="card hidden" style="margin-top: 1rem;">
+        <h2>Tools</h2>
+
+        <button id="load-all" class="secondary-button">Load All Logs (Season)</button>
+        <p id="load-msg" class="status-message"></p>
+
+        <div id="coach-results" class="hidden" style="margin-top: 1rem;">
+          <h3>All Logs</h3>
+          <ul id="all-logs"></ul>
         </div>
-      </div>
-    </section>
 
+        <hr style="margin: 1.25rem 0; border:none; border-top: 1px solid rgba(148,163,184,0.25);" />
+
+        <h3>Reset Season</h3>
+        <p style="margin: 0.5rem 0 1rem 0; opacity: 0.9;">
+          This permanently deletes all logs for the current season.
+        </p>
+
+        <button id="reset-season" class="primary-button">RESET SEASON</button>
+        <p id="reset-msg" class="status-message"></p>
+      </section>
+    </main>
   </div>
 
-  <script src="coach.js"></script>
+  <script src="coach.js?v=20260131a"></script>
 </body>
 </html>

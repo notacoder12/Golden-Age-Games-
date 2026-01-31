@@ -1,6 +1,7 @@
+// === CONFIG: PUT YOUR APPS SCRIPT URL HERE ===
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzoMEl_KNd6sByZF3ycDl2gUMLdBFSD51PpUh0C9nJTf_DwNZi7LveQZ-TVZjefiFTG/exec";
 
-// Tabs
+// === TAB SWITCHING ===
 const tabButtons = document.querySelectorAll(".tab-button");
 const tabContents = document.querySelectorAll(".tab-content");
 
@@ -14,45 +15,51 @@ tabButtons.forEach((btn) => {
   });
 });
 
-// Popup
-function showPopup(message) {
-  const popup = document.getElementById("popup");
-  const popupText = document.getElementById("popup-text");
-  popupText.textContent = message;
+// === POPUP ===
+const popup = document.getElementById("popup");
+const popupBtn = document.getElementById("popup-btn");
+function showPopup(text){
+  document.getElementById("popup-text").textContent = text;
   popup.classList.remove("hidden");
-  document.getElementById("popup-btn").onclick = () => popup.classList.add("hidden");
+  popupBtn.focus();
 }
+popupBtn?.addEventListener("click", () => popup.classList.add("hidden"));
+popup?.addEventListener("click", (e) => {
+  if (e.target === popup) popup.classList.add("hidden");
+});
 
-// Confetti flare
-function confettiBurst(count = 50) {
-  for (let i = 0; i < count; i++) {
-    const piece = document.createElement("div");
-    piece.className = "confetti";
+// === CONFETTI ===
+function confettiBurst(){
+  const pieces = 60;
+  for (let i = 0; i < pieces; i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.width = (6 + Math.random() * 6) + "px";
+    c.style.height = (10 + Math.random() * 12) + "px";
+    c.style.background = Math.random() > 0.5 ? "#fbbf24" : "#38bdf8";
+    c.style.transform = `rotate(${Math.random() * 360}deg)`;
+    c.style.opacity = String(0.9);
 
-    // Random horizontal start
-    piece.style.left = Math.random() * 100 + "vw";
+    document.body.appendChild(c);
 
-    // Random size
-    const w = 6 + Math.random() * 8;
-    const h = 8 + Math.random() * 12;
-    piece.style.width = w + "px";
-    piece.style.height = h + "px";
+    // fall animation (inline, because CSS handles keyframes if you already had it before)
+    c.animate(
+      [
+        { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
+        { transform: `translateY(110vh) rotate(${540 + Math.random()*360}deg)`, opacity: 0 }
+      ],
+      { duration: 1200 + Math.random()*400, easing: "linear" }
+    );
 
-    // Random color
-    const colors = ["#fbbf24", "#38bdf8", "#f97316", "#a78bfa", "#34d399", "#fb7185"];
-    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-
-    // Random rotation and drift
-    piece.style.transform = `translateY(0) rotate(${Math.random() * 360}deg)`;
-    piece.style.animationDuration = 0.9 + Math.random() * 0.8 + "s";
-
-    document.body.appendChild(piece);
-
-    setTimeout(() => piece.remove(), 1600);
+    setTimeout(() => c.remove(), 2000);
   }
 }
 
-// Log Practice
+// Respect reduced motion
+const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// === LOG PRACTICE FORM ===
 const logForm = document.getElementById("log-form");
 const logMessage = document.getElementById("log-message");
 
@@ -73,17 +80,21 @@ logForm.addEventListener("submit", async (e) => {
   }
 
   try {
+    // Use text/plain to work reliably with Apps Script + no-cors
     await fetch(SCRIPT_URL, {
       method: "POST",
       mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({ name, event, minutes, notes })
     });
 
-    confettiBurst(70);
-    showPopup("Logged. Great work, athlete!");
+    logMessage.textContent = "Practice logged! Great work.";
+    logMessage.classList.add("success");
     logForm.reset();
-    logMessage.textContent = "";
+
+    showPopup("Practice logged. Great work!");
+
+    if (!reduceMotion) confettiBurst();
   } catch (err) {
     console.error(err);
     logMessage.textContent = "Something went wrong. Please tell your coach.";
@@ -91,7 +102,7 @@ logForm.addEventListener("submit", async (e) => {
   }
 });
 
-// Progress View
+// === PROGRESS VIEW ===
 const progressNameSelect = document.getElementById("progress-name");
 const loadProgressButton = document.getElementById("load-progress");
 const progressMessage = document.getElementById("progress-message");
@@ -122,24 +133,27 @@ loadProgressButton.addEventListener("click", async () => {
     const res = await fetch(url);
     const data = await res.json();
 
-    if (data.status !== "success") throw new Error(data.message || "Unknown error");
+    if (data.status !== "success") {
+      throw new Error(data.message || "Unknown error from server");
+    }
 
     const logs = data.logs || [];
 
     if (logs.length === 0) {
       progressMessage.textContent = "No practice sessions logged yet.";
-      progressMessage.className = "status-message";
       summarySection.classList.add("hidden");
       chartSection.classList.add("hidden");
       listSection.classList.add("hidden");
       return;
     }
 
+    // Show summary
     const totalMinutes = logs.reduce((sum, entry) => sum + Number(entry.minutes || 0), 0);
-    totalMinutesEl.textContent = totalMinutes;
-    sessionCountEl.textContent = logs.length;
+    totalMinutesEl.textContent = String(totalMinutes);
+    sessionCountEl.textContent = String(logs.length);
     summarySection.classList.remove("hidden");
 
+    // Build a simple recent chart (last 7 sessions)
     const recent = logs.slice(-7);
     const maxMinutes = Math.max(...recent.map((l) => Number(l.minutes || 0)), 1);
     chartBarsContainer.innerHTML = "";
@@ -150,7 +164,8 @@ loadProgressButton.addEventListener("click", async () => {
 
       const inner = document.createElement("div");
       inner.className = "chart-bar-inner";
-      inner.style.height = `${(Number(entry.minutes || 0) / maxMinutes) * 100}%`;
+      const heightPercent = (Number(entry.minutes || 0) / maxMinutes) * 100;
+      inner.style.height = `${heightPercent}%`;
 
       const label = document.createElement("div");
       label.className = "chart-bar-label";
@@ -163,6 +178,7 @@ loadProgressButton.addEventListener("click", async () => {
 
     chartSection.classList.remove("hidden");
 
+    // Build history list
     logList.innerHTML = "";
     logs.slice().reverse().forEach((entry) => {
       const li = document.createElement("li");
@@ -176,7 +192,6 @@ loadProgressButton.addEventListener("click", async () => {
     });
 
     listSection.classList.remove("hidden");
-
     progressMessage.textContent = "";
   } catch (err) {
     console.error(err);

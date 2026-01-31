@@ -5,8 +5,8 @@
   <title>Golden Age Games Practice Log</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Cache-bust so CSS updates always show -->
-  <link rel="stylesheet" href="styles.css?v=20260131a" />
+  <!-- Cache-busted CSS -->
+  <link rel="stylesheet" href="styles.css?v=20260131b" />
 </head>
 
 <body>
@@ -25,7 +25,7 @@
     </nav>
 
     <main class="tab-content-container">
-      <!-- Log Practice Tab -->
+      <!-- LOG TAB -->
       <section id="tab-log" class="tab-content active">
         <h2>Log Today’s Practice</h2>
 
@@ -34,21 +34,21 @@
             <label for="name">Name</label>
             <select id="name" required>
               <option value="" disabled selected>Select your name</option>
-              <option value="David Bennett">David Bennett</option>
-              <option value="Linda Kraus">Linda Kraus</option>
-              <option value="Raine Jackson">Raine Jackson</option>
-              <option value="Mike Escarcida">Mike Escarcida</option>
-              <option value="Ronald Garcia">Ronald Garcia</option>
-              <option value="Elmer Jacbos">Elmer Jacbos</option>
-              <option value="Briant Rutt">Briant Rutt</option>
-              <option value="Clyde Asato">Clyde Asato</option>
-              <option value="Judi Rivera">Judi Rivera</option>
-              <option value="Stephen Foreman">Stephen Foreman</option>
-              <option value="Lamon Jacobs">Lamon Jacobs</option>
-              <option value="Luis Sala">Luis Sala</option>
-              <option value="Mike Shanahan">Mike Shanahan</option>
-              <option value="Doug Elmore">Doug Elmore</option>
-              <option value="Dale Gallego">Dale Gallego</option>
+              <option>David Bennett</option>
+              <option>Linda Kraus</option>
+              <option>Raine Jackson</option>
+              <option>Mike Escarcida</option>
+              <option>Ronald Garcia</option>
+              <option>Elmer Jacbos</option>
+              <option>Briant Rutt</option>
+              <option>Clyde Asato</option>
+              <option>Judi Rivera</option>
+              <option>Stephen Foreman</option>
+              <option>Lamon Jacobs</option>
+              <option>Luis Sala</option>
+              <option>Mike Shanahan</option>
+              <option>Doug Elmore</option>
+              <option>Dale Gallego</option>
             </select>
           </div>
 
@@ -56,36 +56,36 @@
             <label for="event">Event</label>
             <select id="event" required>
               <option value="" disabled selected>Select your event</option>
-              <option value="Air Rifle">Air Rifle</option>
-              <option value="Air Pistol">Air Pistol</option>
-              <option value="Archery">Archery</option>
-              <option value="Badminton">Badminton</option>
-              <option value="Basketball">Basketball</option>
-              <option value="Billiards">Billiards</option>
-              <option value="Disc Golf">Disc Golf</option>
-              <option value="Boccia">Boccia</option>
-              <option value="Bowling">Bowling</option>
-              <option value="Cornhole">Cornhole</option>
-              <option value="Cycling">Cycling</option>
-              <option value="Golf">Golf</option>
-              <option value="Horseshoe">Horseshoe</option>
-              <option value="Pickleball">Pickleball</option>
-              <option value="Powerlifting">Powerlifting</option>
-              <option value="Shuffleboard">Shuffleboard</option>
-              <option value="Swimming">Swimming</option>
-              <option value="Table Tennis">Table Tennis</option>
-              <option value="Track">Track</option>
+              <option>Air Rifle</option>
+              <option>Air Pistol</option>
+              <option>Archery</option>
+              <option>Badminton</option>
+              <option>Basketball</option>
+              <option>Billiards</option>
+              <option>Disc Golf</option>
+              <option>Boccia</option>
+              <option>Bowling</option>
+              <option>Cornhole</option>
+              <option>Cycling</option>
+              <option>Golf</option>
+              <option>Horseshoe</option>
+              <option>Pickleball</option>
+              <option>Powerlifting</option>
+              <option>Shuffleboard</option>
+              <option>Swimming</option>
+              <option>Table Tennis</option>
+              <option>Track</option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="minutes">Minutes Practiced</label>
-            <input type="number" id="minutes" min="0" step="1" inputmode="numeric" placeholder="e.g., 20" required />
+            <input type="number" id="minutes" min="0" step="1" inputmode="numeric" placeholder="e.g. 20" required />
           </div>
 
           <div class="form-group">
             <label for="notes">Notes (optional)</label>
-            <textarea id="notes" rows="3" placeholder="How did it feel today? Anything to remember?"></textarea>
+            <textarea id="notes" rows="3" placeholder="How did it feel today?"></textarea>
           </div>
 
           <button type="submit" class="primary-button">Submit Practice</button>
@@ -93,7 +93,7 @@
         </form>
       </section>
 
-      <!-- Progress Tab -->
+      <!-- PROGRESS TAB -->
       <section id="tab-progress" class="tab-content">
         <h2>View Progress</h2>
 
@@ -102,40 +102,33 @@
             <label for="progress-name">Name</label>
             <select id="progress-name">
               <option value="" disabled selected>Select your name</option>
-              <option value="David Bennett">David Bennett</option>
-              <option value="Linda Kraus">Linda Kraus</option>
-              <option value="Raine Jackson">Raine Jackson</option>
-              <option value="Mike Escarcida">Mike Escarcida</option>
-              <option value="Ronald Garcia">Ronald Garcia</option>
-              <option value="Elmer Jacbos">Elmer Jacbos</option>
-              <option value="Briant Rutt">Briant Rutt</option>
-              <option value="Clyde Asato">Clyde Asato</option>
-              <option value="Judi Rivera">Judi Rivera</option>
-              <option value="Stephen Foreman">Stephen Foreman</option>
-              <option value="Lamon Jacobs">Lamon Jacobs</option>
-              <option value="Luis Sala">Luis Sala</option>
-              <option value="Mike Shanahan">Mike Shanahan</option>
-              <option value="Doug Elmore">Doug Elmore</option>
-              <option value="Dale Gallego">Dale Gallego</option>
+              <option>David Bennett</option>
+              <option>Linda Kraus</option>
+              <option>Raine Jackson</option>
+              <option>Mike Escarcida</option>
+              <option>Ronald Garcia</option>
+              <option>Elmer Jacbos</option>
+              <option>Briant Rutt</option>
+              <option>Clyde Asato</option>
+              <option>Judi Rivera</option>
+              <option>Stephen Foreman</option>
+              <option>Lamon Jacobs</option>
+              <option>Luis Sala</option>
+              <option>Mike Shanahan</option>
+              <option>Doug Elmore</option>
+              <option>Dale Gallego</option>
             </select>
           </div>
 
           <button id="load-progress" class="secondary-button">Load Progress</button>
-          <p id="progress-message" class="status-message" aria-live="polite"></p>
+          <p id="progress-message" class="status-message"></p>
 
           <div id="progress-summary" class="progress-summary hidden">
-            <h3>Summary</h3>
             <p><strong>Total Minutes:</strong> <span id="total-minutes">0</span></p>
             <p><strong>Sessions Logged:</strong> <span id="session-count">0</span></p>
           </div>
 
-          <div id="progress-chart" class="progress-chart hidden">
-            <h3>Recent Sessions</h3>
-            <div id="chart-bars" class="chart-bars"></div>
-          </div>
-
           <div id="progress-list" class="progress-list hidden">
-            <h3>Practice History</h3>
             <ul id="log-list"></ul>
           </div>
         </div>
@@ -143,17 +136,17 @@
     </main>
   </div>
 
-  <script src="script.js?v=20260131a"></script>
+  <!-- Cache-busted JS -->
+  <script src="script.js?v=20260131b"></script>
 
   <!-- Popup -->
-  <div id="popup" class="popup hidden" role="dialog" aria-modal="true" aria-labelledby="popup-text">
+  <div id="popup" class="popup hidden">
     <div class="popup-content">
-      <p id="popup-text">Practice Logged Successfully!</p>
+      <p id="popup-text">Practice Logged!</p>
       <button id="popup-btn" class="primary-button">OK</button>
     </div>
   </div>
 
-  <!-- Coach link (hidden but usable if you type /coach.html) -->
   <a href="coach.html" style="display:none;">coach</a>
 </body>
 </html>

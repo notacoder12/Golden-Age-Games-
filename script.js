@@ -1,14 +1,18 @@
-// === CONFIG: PUT YOUR APPS SCRIPT URL HERE ===
+// ==============================
+// CONFIG
+// ==============================
 const SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbzoMEl_KNd6sByZF3ycDl2gUMLdBFSD51PpUh0C9nJTf_DwNZi7LveQZ-TVZjefiFTG/exec";
 
-// === TAB SWITCHING ===
+// ==============================
+// TAB SWITCHING
+// ==============================
 const tabButtons = document.querySelectorAll(".tab-button");
 const tabContents = document.querySelectorAll(".tab-content");
 
 tabButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
-    const target = btn.getAttribute("data-tab");
+    const target = btn.dataset.tab;
     tabButtons.forEach((b) => b.classList.remove("active"));
     tabContents.forEach((c) => c.classList.remove("active"));
     btn.classList.add("active");
@@ -16,7 +20,9 @@ tabButtons.forEach((btn) => {
   });
 });
 
-// === POPUP ===
+// ==============================
+// POPUP
+// ==============================
 const popup = document.getElementById("popup");
 const popupBtn = document.getElementById("popup-btn");
 
@@ -31,30 +37,25 @@ popup?.addEventListener("click", (e) => {
   if (e.target === popup) popup.classList.add("hidden");
 });
 
-// === CONFETTI ===
+// ==============================
+// CONFETTI
+// ==============================
 function confettiBurst() {
-  const pieces = 60;
-  for (let i = 0; i < pieces; i++) {
+  for (let i = 0; i < 60; i++) {
     const c = document.createElement("div");
     c.className = "confetti";
     c.style.left = Math.random() * 100 + "vw";
     c.style.width = 6 + Math.random() * 6 + "px";
     c.style.height = 10 + Math.random() * 12 + "px";
     c.style.background = Math.random() > 0.5 ? "#fbbf24" : "#38bdf8";
-    c.style.transform = `rotate(${Math.random() * 360}deg)`;
-    c.style.opacity = "0.95";
-
     document.body.appendChild(c);
 
     c.animate(
       [
-        { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
-        {
-          transform: `translateY(110vh) rotate(${540 + Math.random() * 360}deg)`,
-          opacity: 0
-        }
+        { transform: "translateY(0)", opacity: 1 },
+        { transform: "translateY(110vh)", opacity: 0 }
       ],
-      { duration: 1200 + Math.random() * 400, easing: "linear" }
+      { duration: 1400, easing: "linear" }
     );
 
     setTimeout(() => c.remove(), 2000);
@@ -62,95 +63,89 @@ function confettiBurst() {
 }
 
 const reduceMotion =
-  window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.matchMedia &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// === SAFE SUBMIT FALLBACK (works even if CORS blocks POST) ===
-// Uses an "image beacon" GET request with encoded data.
-// This requires your Apps Script to support GET-based logging to truly store the log.
-// If your current Code.gs doesn't support it, the normal POST will still work when allowed.
-function submitBeaconFallback(payload) {
-  return new Promise((resolve) => {
-    // We still "resolve" because beacon can't confirm response.
-    // This is ONLY used if the normal POST is blocked by CORS.
-    const encoded = encodeURIComponent(JSON.stringify(payload));
-    const img = new Image();
-    img.onload = () => resolve(true);
-    img.onerror = () => resolve(true);
-
-    // action=logViaGet is a convention; if your backend doesn't handle it,
-    // you can add it later. This at least prevents false "error" messages.
-    img.src = `${SCRIPT_URL}?action=logViaGet&data=${encoded}&_=${Date.now()}`;
-  });
-}
-
-// === LOG PRACTICE FORM ===
+// ==============================
+// FORM LOGIC
+// ==============================
 const logForm = document.getElementById("log-form");
 const logMessage = document.getElementById("log-message");
+let isSubmitting = false;
+
+// Clear stale messages if page is restored
+window.addEventListener("pageshow", () => {
+  logMessage.textContent = "";
+  logMessage.className = "status-message";
+});
 
 logForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  logMessage.textContent = "Submitting...";
-  logMessage.className = "status-message";
-
-  const name = document.getElementById("name").value;
-  const event = document.getElementById("event").value;
-  const minutes = document.getElementById("minutes").value;
-  const notes = document.getElementById("notes").value;
-
-  if (!name || !event || !minutes) {
-    logMessage.textContent = "Please fill in name, event, and minutes.";
-    logMessage.classList.add("error");
-    return;
-  }
-
-  const payload = { name, event, minutes, notes };
+  if (isSubmitting) return;
+  isSubmitting = true;
 
   try {
-    // === Attempt normal POST first (BEST) ===
+    logMessage.textContent = "Submitting...";
+    logMessage.className = "status-message";
+
+    const payload = {
+      name: document.getElementById("name").value,
+      event: document.getElementById("event").value,
+      minutes: document.getElementById("minutes").value,
+      notes: document.getElementById("notes").value
+    };
+
+    if (!payload.name || !payload.event || !payload.minutes) {
+      logMessage.textContent = "Please complete all required fields.";
+      logMessage.classList.add("error");
+      return;
+    }
+
     const res = await fetch(SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload)
     });
 
-    // If Apps Script returns JSON, we can read it and confirm success:
     const data = await res.json();
+    if (data.status !== "success") throw new Error();
 
-    if (data.status !== "success") {
-      throw new Error(data.message || "Server error");
-    }
-
-    // ✅ True success
     logMessage.textContent = "Practice logged! Great work.";
-    logMessage.classList.add("success");
+    logMessage.className = "status-message success";
     logForm.reset();
 
     showPopup("Practice logged. Great work!");
     if (!reduceMotion) confettiBurst();
   } catch (err) {
-    // If CORS blocks reading response or request fails, fall back so user isn't punished.
-    console.warn("POST failed or blocked. Using fallback.", err);
+    console.warn("POST failed, using fallback.");
 
     try {
-      await submitBeaconFallback(payload);
+      const img = new Image();
+      img.src =
+        SCRIPT_URL +
+        "?fallback=1&data=" +
+        encodeURIComponent(JSON.stringify(payload)) +
+        "&t=" +
+        Date.now();
 
-      // We can't confirm, so label it as "sent" instead of "logged"
       logMessage.textContent = "Submitted! If it doesn’t show up, tell your coach.";
       logMessage.className = "status-message success";
       logForm.reset();
 
-      showPopup("Submitted! (If it doesn’t appear, tell your coach.)");
+      showPopup("Submitted!");
       if (!reduceMotion) confettiBurst();
-    } catch (e2) {
-      console.error(e2);
+    } catch {
       logMessage.textContent = "Something went wrong. Please tell your coach.";
       logMessage.className = "status-message error";
     }
+  } finally {
+    isSubmitting = false;
   }
 });
 
-// === PROGRESS VIEW ===
+// ==============================
+// PROGRESS VIEW
+// ==============================
 const progressNameSelect = document.getElementById("progress-name");
 const loadProgressButton = document.getElementById("load-progress");
 const progressMessage = document.getElementById("progress-message");
@@ -167,7 +162,6 @@ const logList = document.getElementById("log-list");
 
 loadProgressButton.addEventListener("click", async () => {
   const name = progressNameSelect.value;
-
   if (!name) {
     progressMessage.textContent = "Please select your name.";
     progressMessage.className = "status-message error";
@@ -178,88 +172,47 @@ loadProgressButton.addEventListener("click", async () => {
   progressMessage.className = "status-message";
 
   try {
-    const url = `${SCRIPT_URL}?name=${encodeURIComponent(name)}`;
-    const res = await fetch(url);
+    const res = await fetch(`${SCRIPT_URL}?name=${encodeURIComponent(name)}`);
     const data = await res.json();
-
-    if (data.status !== "success") {
-      throw new Error(data.message || "Unknown error from server");
-    }
+    if (data.status !== "success") throw new Error();
 
     const logs = data.logs || [];
-
-    if (logs.length === 0) {
-      progressMessage.textContent = "No practice sessions logged yet.";
-      summarySection.classList.add("hidden");
-      chartSection.classList.add("hidden");
-      listSection.classList.add("hidden");
+    if (!logs.length) {
+      progressMessage.textContent = "No practices logged yet.";
       return;
     }
 
-    // Summary
-    const totalMinutes = logs.reduce((sum, entry) => sum + Number(entry.minutes || 0), 0);
-    totalMinutesEl.textContent = String(totalMinutes);
-    sessionCountEl.textContent = String(logs.length);
+    const total = logs.reduce((s, l) => s + Number(l.minutes || 0), 0);
+    totalMinutesEl.textContent = total;
+    sessionCountEl.textContent = logs.length;
     summarySection.classList.remove("hidden");
 
-    // Recent chart (last 7)
-    const recent = logs.slice(-7);
-    const maxMinutes = Math.max(...recent.map((l) => Number(l.minutes || 0)), 1);
     chartBarsContainer.innerHTML = "";
-
-    recent.forEach((entry) => {
+    logs.slice(-7).forEach((l) => {
       const bar = document.createElement("div");
       bar.className = "chart-bar";
 
       const inner = document.createElement("div");
       inner.className = "chart-bar-inner";
-      const heightPercent = (Number(entry.minutes || 0) / maxMinutes) * 100;
-      inner.style.height = `${heightPercent}%`;
-
-      const label = document.createElement("div");
-      label.className = "chart-bar-label";
-      label.textContent = `${Number(entry.minutes || 0)} min`;
+      inner.style.height = Math.min(100, l.minutes * 3) + "%";
 
       bar.appendChild(inner);
-      bar.appendChild(label);
       chartBarsContainer.appendChild(bar);
     });
 
     chartSection.classList.remove("hidden");
 
-    // History list
     logList.innerHTML = "";
-    logs
-      .slice()
-      .reverse()
-      .forEach((entry) => {
-        const li = document.createElement("li");
-        const date = new Date(entry.timestamp);
-        const dateStr = isNaN(date.getTime())
-          ? ""
-          : date.toLocaleString(undefined, {
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit"
-            });
-
-        li.textContent = `${dateStr} — ${entry.event} — ${entry.minutes} min${
-          entry.notes ? " — " + entry.notes : ""
-        }`;
-        logList.appendChild(li);
-      });
+    logs.reverse().forEach((l) => {
+      const li = document.createElement("li");
+      li.textContent = `${new Date(l.timestamp).toLocaleString()} — ${l.event} — ${l.minutes} min`;
+      logList.appendChild(li);
+    });
 
     listSection.classList.remove("hidden");
-
     progressMessage.textContent = "";
-    progressMessage.className = "status-message";
-  } catch (err) {
-    console.error(err);
-    progressMessage.textContent = "Could not load progress. Please tell your coach.";
+  } catch {
+    progressMessage.textContent = "Could not load progress.";
     progressMessage.className = "status-message error";
-    summarySection.classList.add("hidden");
-    chartSection.classList.add("hidden");
-    listSection.classList.add("hidden");
   }
 });

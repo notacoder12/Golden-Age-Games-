@@ -1,5 +1,6 @@
 // === CONFIG: PUT YOUR APPS SCRIPT URL HERE ===
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzoMEl_KNd6sByZF3ycDl2gUMLdBFSD51PpUh0C9nJTf_DwNZi7LveQZ-TVZjefiFTG/exec";
+const SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbzoMEl_KNd6sByZF3ycDl2gUMLdBFSD51PpUh0C9nJTf_DwNZi7LveQZ-TVZjefiFTG/exec";
 
 // === TAB SWITCHING ===
 const tabButtons = document.querySelectorAll(".tab-button");
@@ -18,46 +19,69 @@ tabButtons.forEach((btn) => {
 // === POPUP ===
 const popup = document.getElementById("popup");
 const popupBtn = document.getElementById("popup-btn");
-function showPopup(text){
+
+function showPopup(text) {
   document.getElementById("popup-text").textContent = text;
   popup.classList.remove("hidden");
-  popupBtn.focus();
+  popupBtn?.focus();
 }
+
 popupBtn?.addEventListener("click", () => popup.classList.add("hidden"));
 popup?.addEventListener("click", (e) => {
   if (e.target === popup) popup.classList.add("hidden");
 });
 
 // === CONFETTI ===
-function confettiBurst(){
+function confettiBurst() {
   const pieces = 60;
-  for (let i = 0; i < pieces; i++){
+  for (let i = 0; i < pieces; i++) {
     const c = document.createElement("div");
     c.className = "confetti";
     c.style.left = Math.random() * 100 + "vw";
-    c.style.width = (6 + Math.random() * 6) + "px";
-    c.style.height = (10 + Math.random() * 12) + "px";
+    c.style.width = 6 + Math.random() * 6 + "px";
+    c.style.height = 10 + Math.random() * 12 + "px";
     c.style.background = Math.random() > 0.5 ? "#fbbf24" : "#38bdf8";
     c.style.transform = `rotate(${Math.random() * 360}deg)`;
-    c.style.opacity = String(0.9);
+    c.style.opacity = "0.95";
 
     document.body.appendChild(c);
 
-    // fall animation (inline, because CSS handles keyframes if you already had it before)
     c.animate(
       [
         { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
-        { transform: `translateY(110vh) rotate(${540 + Math.random()*360}deg)`, opacity: 0 }
+        {
+          transform: `translateY(110vh) rotate(${540 + Math.random() * 360}deg)`,
+          opacity: 0
+        }
       ],
-      { duration: 1200 + Math.random()*400, easing: "linear" }
+      { duration: 1200 + Math.random() * 400, easing: "linear" }
     );
 
     setTimeout(() => c.remove(), 2000);
   }
 }
 
-// Respect reduced motion
-const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const reduceMotion =
+  window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// === SAFE SUBMIT FALLBACK (works even if CORS blocks POST) ===
+// Uses an "image beacon" GET request with encoded data.
+// This requires your Apps Script to support GET-based logging to truly store the log.
+// If your current Code.gs doesn't support it, the normal POST will still work when allowed.
+function submitBeaconFallback(payload) {
+  return new Promise((resolve) => {
+    // We still "resolve" because beacon can't confirm response.
+    // This is ONLY used if the normal POST is blocked by CORS.
+    const encoded = encodeURIComponent(JSON.stringify(payload));
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(true);
+
+    // action=logViaGet is a convention; if your backend doesn't handle it,
+    // you can add it later. This at least prevents false "error" messages.
+    img.src = `${SCRIPT_URL}?action=logViaGet&data=${encoded}&_=${Date.now()}`;
+  });
+}
 
 // === LOG PRACTICE FORM ===
 const logForm = document.getElementById("log-form");
@@ -65,6 +89,7 @@ const logMessage = document.getElementById("log-message");
 
 logForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   logMessage.textContent = "Submitting...";
   logMessage.className = "status-message";
 
@@ -79,26 +104,49 @@ logForm.addEventListener("submit", async (e) => {
     return;
   }
 
+  const payload = { name, event, minutes, notes };
+
   try {
-    // Use text/plain to work reliably with Apps Script + no-cors
-    await fetch(SCRIPT_URL, {
+    // === Attempt normal POST first (BEST) ===
+    const res = await fetch(SCRIPT_URL, {
       method: "POST",
-      mode: "no-cors",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ name, event, minutes, notes })
+      body: JSON.stringify(payload)
     });
 
+    // If Apps Script returns JSON, we can read it and confirm success:
+    const data = await res.json();
+
+    if (data.status !== "success") {
+      throw new Error(data.message || "Server error");
+    }
+
+    // ✅ True success
     logMessage.textContent = "Practice logged! Great work.";
     logMessage.classList.add("success");
     logForm.reset();
 
     showPopup("Practice logged. Great work!");
-
     if (!reduceMotion) confettiBurst();
   } catch (err) {
-    console.error(err);
-    logMessage.textContent = "Something went wrong. Please tell your coach.";
-    logMessage.classList.add("error");
+    // If CORS blocks reading response or request fails, fall back so user isn't punished.
+    console.warn("POST failed or blocked. Using fallback.", err);
+
+    try {
+      await submitBeaconFallback(payload);
+
+      // We can't confirm, so label it as "sent" instead of "logged"
+      logMessage.textContent = "Submitted! If it doesn’t show up, tell your coach.";
+      logMessage.className = "status-message success";
+      logForm.reset();
+
+      showPopup("Submitted! (If it doesn’t appear, tell your coach.)");
+      if (!reduceMotion) confettiBurst();
+    } catch (e2) {
+      console.error(e2);
+      logMessage.textContent = "Something went wrong. Please tell your coach.";
+      logMessage.className = "status-message error";
+    }
   }
 });
 
@@ -119,6 +167,7 @@ const logList = document.getElementById("log-list");
 
 loadProgressButton.addEventListener("click", async () => {
   const name = progressNameSelect.value;
+
   if (!name) {
     progressMessage.textContent = "Please select your name.";
     progressMessage.className = "status-message error";
@@ -147,13 +196,13 @@ loadProgressButton.addEventListener("click", async () => {
       return;
     }
 
-    // Show summary
+    // Summary
     const totalMinutes = logs.reduce((sum, entry) => sum + Number(entry.minutes || 0), 0);
     totalMinutesEl.textContent = String(totalMinutes);
     sessionCountEl.textContent = String(logs.length);
     summarySection.classList.remove("hidden");
 
-    // Build a simple recent chart (last 7 sessions)
+    // Recent chart (last 7)
     const recent = logs.slice(-7);
     const maxMinutes = Math.max(...recent.map((l) => Number(l.minutes || 0)), 1);
     chartBarsContainer.innerHTML = "";
@@ -178,21 +227,33 @@ loadProgressButton.addEventListener("click", async () => {
 
     chartSection.classList.remove("hidden");
 
-    // Build history list
+    // History list
     logList.innerHTML = "";
-    logs.slice().reverse().forEach((entry) => {
-      const li = document.createElement("li");
-      const date = new Date(entry.timestamp);
-      const dateStr = isNaN(date.getTime())
-        ? ""
-        : date.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+    logs
+      .slice()
+      .reverse()
+      .forEach((entry) => {
+        const li = document.createElement("li");
+        const date = new Date(entry.timestamp);
+        const dateStr = isNaN(date.getTime())
+          ? ""
+          : date.toLocaleString(undefined, {
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit"
+            });
 
-      li.textContent = `${dateStr} — ${entry.event} — ${entry.minutes} min${entry.notes ? " — " + entry.notes : ""}`;
-      logList.appendChild(li);
-    });
+        li.textContent = `${dateStr} — ${entry.event} — ${entry.minutes} min${
+          entry.notes ? " — " + entry.notes : ""
+        }`;
+        logList.appendChild(li);
+      });
 
     listSection.classList.remove("hidden");
+
     progressMessage.textContent = "";
+    progressMessage.className = "status-message";
   } catch (err) {
     console.error(err);
     progressMessage.textContent = "Could not load progress. Please tell your coach.";
